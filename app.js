@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const users = require('./routes/users'); // импортируем роутер Users
 const cards = require('./routes/cards'); // импортируем роутер Cards
-const { NOT_FOUND } = require('./controllers/constants');
+const { NOT_FOUND } = require('./utils/constants');
 
 const { PORT = 3000 } = process.env;
 const app = express();

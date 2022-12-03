@@ -4,7 +4,7 @@ const {
   NOT_FOUND,
   SERVER_ERROR,
   CREATED,
-} = require('./constants');
+} = require('../utils/constants');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -55,19 +55,21 @@ module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
 
   User.findOneAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
-    .then((user) => res.send({
-      _id: user._id,
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-    }))
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError' || err.name === 'BadRequest') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
+    .then((user) => {
+      if (!user) {
+        res.status(NOT_FOUND).send({ message: 'Пользователь с указанным ID не найден.' });
         return;
       }
-      if (err.name === 'NotFoundError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь с указанным ID не найден.' });
+      res.send({
+        _id: user._id,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+      });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
         return;
       }
       res.status(SERVER_ERROR).send({ message: 'Ошибка сервера.' });

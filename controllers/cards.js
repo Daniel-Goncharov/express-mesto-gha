@@ -4,7 +4,7 @@ const {
   NOT_FOUND,
   SERVER_ERROR,
   CREATED,
-} = require('./constants');
+} = require('../utils/constants');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -52,7 +52,7 @@ module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true },
   )
     .populate(['owner', 'likes'])
     .then((card) => {
@@ -79,7 +79,7 @@ module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true },
   )
     .populate(['owner', 'likes'])
     .then((card) => {
