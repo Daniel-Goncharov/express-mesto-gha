@@ -1,13 +1,16 @@
 const User = require('../models/user');
-
-const ERROR_400 = 'Переданы некорректные данные.';
-const ERROR_404 = 'Пользователь с указанным ID не найден.';
+const {
+  BAD_REQUEST,
+  NOT_FOUND,
+  SERVER_ERROR,
+  CREATED,
+} = require('./constants');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => {
-      res.status(500).send({ message: err.message });
+    .catch(() => {
+      res.status(SERVER_ERROR).send({ message: 'Ошибка сервера.' });
     });
 };
 
@@ -15,17 +18,17 @@ module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: ERROR_404 });
+        res.status(NOT_FOUND).send({ message: 'Пользователь с указанным ID не найден.' });
         return;
       }
       res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: ERROR_400 });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
         return;
       }
-      res.status(500).send({ message: err.message });
+      res.status(SERVER_ERROR).send({ message: 'Ошибка сервера.' });
     });
 };
 
@@ -33,7 +36,7 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((user) => res.send({
+    .then((user) => res.status(CREATED).send({
       _id: user._id,
       name,
       about,
@@ -41,10 +44,10 @@ module.exports.createUser = (req, res) => {
     }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: ERROR_400 });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
         return;
       }
-      res.status(500).send({ message: err.message });
+      res.status(SERVER_ERROR).send({ message: 'Ошибка сервера.' });
     });
 };
 
@@ -59,15 +62,15 @@ module.exports.updateUser = (req, res) => {
       avatar: user.avatar,
     }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: ERROR_400 });
+      if (err.name === 'ValidationError' || err.name === 'CastError' || err.name === 'BadRequest') {
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
         return;
       }
-      if (err.name === 'CastError') {
-        res.status(404).send({ message: ERROR_404 });
+      if (err.name === 'NotFoundError') {
+        res.status(NOT_FOUND).send({ message: 'Пользователь с указанным ID не найден.' });
         return;
       }
-      res.status(500).send({ message: err.message });
+      res.status(SERVER_ERROR).send({ message: 'Ошибка сервера.' });
     });
 };
 
@@ -78,9 +81,13 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.send({ _id: user._id, avatar: user.avatar }))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(400).send({ message: ERROR_400 });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
         return;
       }
-      res.status(500).send({ message: err.message });
+      if (err.name === 'NotFoundError') {
+        res.status(NOT_FOUND).send({ message: 'Пользователь с указанным ID не найден.' });
+        return;
+      }
+      res.status(SERVER_ERROR).send({ message: 'Ошибка сервера.' });
     });
 };

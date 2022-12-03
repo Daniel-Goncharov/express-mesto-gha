@@ -1,13 +1,17 @@
 const Card = require('../models/card');
-
-const ERROR_400 = 'Переданы некорректные данные.';
-const ERROR_404 = 'Карточка с указанным ID не найдена.';
+const {
+  BAD_REQUEST,
+  NOT_FOUND,
+  SERVER_ERROR,
+  CREATED,
+} = require('./constants');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
+    .populate(['owner', 'likes'])
     .then((cards) => res.send({ data: cards }))
-    .catch((err) => {
-      res.status(500).send({ message: err.message });
+    .catch(() => {
+      res.status(SERVER_ERROR).send({ message: 'Ошибка сервера.' });
     });
 };
 
@@ -16,13 +20,13 @@ module.exports.createCard = (req, res) => {
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
-    .then((card) => res.send(card))
+    .then((card) => res.status(CREATED).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: ERROR_400 });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
         return;
       }
-      res.status(500).send({ message: err.message });
+      res.status(SERVER_ERROR).send({ message: 'Ошибка сервера.' });
     });
 };
 
@@ -30,17 +34,17 @@ module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: ERROR_404 });
+        res.status(NOT_FOUND).send({ message: 'Карточка с указанным ID не найдена.' });
         return;
       }
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: ERROR_400 });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
         return;
       }
-      res.status(500).send({ message: err.message });
+      res.status(SERVER_ERROR).send({ message: 'Ошибка сервера.' });
     });
 };
 
@@ -50,9 +54,10 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
+    .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: ERROR_404 });
+        res.status(NOT_FOUND).send({ message: 'Карточка с указанным ID не найдена.' });
         return;
       }
       res.send({
@@ -62,11 +67,11 @@ module.exports.likeCard = (req, res) => {
       });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(400).send({ message: ERROR_400 });
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
         return;
       }
-      res.status(500).send({ message: err.message });
+      res.status(SERVER_ERROR).send({ message: 'Ошибка сервера.' });
     });
 };
 
@@ -76,9 +81,10 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
+    .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: ERROR_404 });
+        res.status(NOT_FOUND).send({ message: 'Карточка с указанным ID не найдена.' });
         return;
       }
       res.send({
@@ -88,10 +94,10 @@ module.exports.dislikeCard = (req, res) => {
       });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(400).send({ message: ERROR_400 });
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
         return;
       }
-      res.status(500).send({ message: err.message });
+      res.status(SERVER_ERROR).send({ message: 'Ошибка сервера.' });
     });
 };
