@@ -60,11 +60,7 @@ module.exports.likeCard = (req, res) => {
         res.status(NOT_FOUND).send({ message: 'Карточка с указанным ID не найдена.' });
         return;
       }
-      res.send({
-        _id: card._id,
-        name: card.name,
-        link: card.link,
-      });
+      res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -87,11 +83,7 @@ module.exports.dislikeCard = (req, res) => {
         res.status(NOT_FOUND).send({ message: 'Карточка с указанным ID не найдена.' });
         return;
       }
-      res.send({
-        _id: card._id,
-        name: card.name,
-        link: card.link,
-      });
+      res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {

@@ -60,12 +60,7 @@ module.exports.updateUser = (req, res) => {
         res.status(NOT_FOUND).send({ message: 'Пользователь с указанным ID не найден.' });
         return;
       }
-      res.send({
-        _id: user._id,
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-      });
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
@@ -80,14 +75,16 @@ module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
 
   User.findOneAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
-    .then((user) => res.send({ _id: user._id, avatar: user.avatar }))
+    .then((user) => {
+      if (!user) {
+        res.status(NOT_FOUND).send({ message: 'Пользователь с указанным ID не найден.' });
+        return;
+      }
+      res.send(user);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
-        return;
-      }
-      if (err.name === 'NotFoundError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь с указанным ID не найден.' });
         return;
       }
       res.status(SERVER_ERROR).send({ message: 'Ошибка сервера.' });
