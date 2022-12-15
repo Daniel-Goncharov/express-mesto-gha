@@ -19,7 +19,7 @@ router.use('/users', userRouter);
 router.use('/cards', cardRouter);
 
 router.all('*', express.json(), (req, res, next) => {
-  next(new NotFoundError('Запрашиваемая страница не найдена'));
+  next(new NotFoundError({ message: 'Запрашиваемая страница не найдена' }));
 });
 
 module.exports = router;
