@@ -9,14 +9,14 @@ const {
 } = require('../controllers/cards'); // импортируем контроллеры из cards
 
 const {
-  validateCreateCard,
-  validateCardId,
-} = require('../middlewares/requestValidation'); // импортируем валидаторы
+  cardValidator,
+  cardIdValidator,
+} = require('../middlewares/validation'); // импортируем валидаторы
 
 router.get('/', getCards); // получить все карточки
-router.post('/', validateCreateCard, createCard); // создать новую карточку
-router.delete('/:cardId', validateCardId, deleteCard); // удалить карточку по id
-router.put('/:cardId/likes', validateCardId, likeCard); // поставить лайк карточке
-router.delete('/:cardId/likes', validateCardId, dislikeCard); // убрать лайк с карточки
+router.post('/', cardValidator, createCard); // создать новую карточку
+router.delete('/:cardId', cardIdValidator, deleteCard); // удалить карточку по id
+router.put('/:cardId/likes', cardIdValidator, likeCard); // поставить лайк карточке
+router.delete('/:cardId/likes', cardIdValidator, dislikeCard); // убрать лайк с карточки
 
 module.exports = router;
