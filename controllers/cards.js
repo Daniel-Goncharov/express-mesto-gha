@@ -18,18 +18,18 @@ module.exports.getCards = (req, res, next) => {
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user })
+    .then((card) => {
+      res.send(card);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(
           new BadRequestError({
-            message: `Для создания карточки переданы некорректные данные: ${err.message}`,
+            message: 'Для создания карточки переданы некорректные данные',
           }),
         );
       }
       return next(err);
-    })
-    .then((card) => {
-      res.send(card);
     });
 };
 
@@ -47,7 +47,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (err.name === 'CastError') {
         return next(
           new BadRequestError({
-            message: `Передан неверный _id карточки: ${err.message}`,
+            message: 'Передан неверный _id карточки',
           }),
         );
       }
@@ -67,7 +67,7 @@ module.exports.likeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         return next(
           new BadRequestError({
-            message: `Передан неверный _id карточки: ${err.message}`,
+            message: 'Передан неверный _id карточки',
           }),
         );
       }
@@ -87,7 +87,7 @@ module.exports.dislikeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         return next(
           new BadRequestError({
-            message: `Передан неверный _id карточки: ${err.message}`,
+            message: 'Передан неверный _id карточки',
           }),
         );
       }

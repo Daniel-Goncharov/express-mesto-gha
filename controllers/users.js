@@ -28,7 +28,7 @@ module.exports.getUserById = (req, res, next) => {
       if (err.name === 'CastError') {
         return next(
           new BadRequestError({
-            message: `При зпросе пользователя переданы некорректные данные: ${err.message}`,
+            message: 'При зпросе пользователя переданы некорректные данные',
           }),
         );
       }
@@ -67,14 +67,14 @@ module.exports.createUser = (req, res, next) => {
       if (err.code === 11000) {
         return next(
           new ConflictError({
-            message: `Пользователь с таким email уже существует: ${err.message}`,
+            message: 'Пользователь с таким email уже существует',
           }),
         );
       }
       if (err.name === 'ValidationError') {
         return next(
           new BadRequestError({
-            message: `При регистрации пользователя переданы некорректные данные: ${err.message}`,
+            message: 'При регистрации пользователя переданы некорректные данные',
           }),
         );
       }
@@ -111,7 +111,7 @@ module.exports.updateProfile = (req, res, next) => {
       if (err.name === 'ValidationError') {
         return next(
           new BadRequestError({
-            message: `При обновлении профиля переданы некорректные данные: ${err.message}`,
+            message: 'При обновлении профиля переданы некорректные данные',
           }),
         );
       }
@@ -131,7 +131,7 @@ module.exports.updateAvatar = (req, res, next) => {
       if (err.name === 'ValidationError') {
         return next(
           new BadRequestError({
-            message: `При обновлении аватара переданы некорректные данные: ${err.message}`,
+            message: 'При обновлении аватара переданы некорректные данные',
           }),
         );
       }

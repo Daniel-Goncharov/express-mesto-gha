@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       validate: {
         validator(link) {
-          return /^https?:\/\/(www\.)?[\w\-._~:/?#[\]@!$&'()*+,;=]+$/.test(link);
+          return /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w\W.-]*)#?$/.test(link);
         },
         message: (props) => `${props.value} вы указали некорретный URL`,
       },
@@ -41,7 +41,6 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, 'Не введен пароль'],
-      minlength: [8, 'Поле `Пароль` не должно быть короче 8 символов'],
       select: false,
     },
   },
