@@ -1,11 +1,7 @@
-const BAD_REQUEST = 400;
-const NOT_FOUND = 404;
-const SERVER_ERROR = 500;
-const CREATED = 201;
-
-module.exports = {
-  BAD_REQUEST,
-  NOT_FOUND,
-  SERVER_ERROR,
-  CREATED,
-};
+module.exports.CREATED_CODE = 201;
+module.exports.BAD_REQUEST_ERROR_CODE = 400;
+module.exports.UNAUTHORIZED_ERROR_CODE = 401;
+module.exports.FORBIDDEN_ERROR_CODE = 403;
+module.exports.NOT_FOUND_ERROR_CODE = 404;
+module.exports.CONFLICT_ERROR_CODE = 409;
+module.exports.INTERNAL_SERVER_ERROR_CODE = 500;

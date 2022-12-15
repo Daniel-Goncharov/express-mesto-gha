@@ -1,32 +1,44 @@
+// импорты
+require('dotenv').config();
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
-const users = require('./routes/users'); // импортируем роутер Users
-const cards = require('./routes/cards'); // импортируем роутер Cards
-const { NOT_FOUND } = require('./utils/constants');
+const { errors } = require('celebrate');
+const NotFoundError = require('./errors/NotFoundError');
+const { createUser, login } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+const { validateSignup, validateSignin } = require('./middlewares/requestValidation');
+const { errorHandler } = require('./middlewares/errorHandler');
 
 const { PORT = 3000 } = process.env;
 const app = express();
-
-app.use(express.json());
-
-// временное решение авторизации
-app.use((req, res, next) => {
-  req.user = {
-    _id: '6389e9db406cfea2b5f15ba3',
-  };
-
-  next();
-});
-
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
 
-app.use('/users', users); // запускаем роутер Users
-app.use('/cards', cards); // запускаем роутер Cards
+// Middlewares
+app.use(express.json());
+app.use(cookieParser());
 
-app.all('/*', (req, res) => {
-  res.status(NOT_FOUND).send({ message: 'Такой страницы не существует.' });
-}); // проверка на корректность ввода адреса URL
+// Маршруты без авторизации
+app.use('/signin', validateSignin, login);
+app.use('/signup', validateSignup, createUser);
 
+// Маршруты с обязательной авторизацией
+app.use(auth);
+app.use('/users', require('./routes/users'));
+app.use('/cards', require('./routes/cards'));
+
+// проверка на корректность ввода адреса URL
+app.use('*', (req, res, next) => {
+  next(new NotFoundError({ message: 'Такой страницы не существует.' }));
+});
+
+// Обработчик ошибок celebrate
+app.use(errors());
+
+// Централизованный обработчик ошибок
+app.use(errorHandler);
+
+// Запуск сервера
 app.listen(PORT);
